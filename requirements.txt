@@ -1,0 +1,11 @@
+tensorflow
+keras-applications==1.0.8
+keras-preprocessing==1.1.2
+tenseal
+pandas
+numpy
+prometheus_api_client
+boto3
+fastapi
+uvicorn
+boto3
