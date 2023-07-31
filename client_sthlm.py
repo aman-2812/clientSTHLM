@@ -6,6 +6,7 @@ import numpy as np
 import pickle
 import base64
 import boto3
+from logger_config import logger
 
 # Functions required
 
@@ -36,11 +37,11 @@ def download_file_from_s3(bucket_name, object_name, local_file_path):
     s3_client = boto3.client("s3",
                       region_name="eu-north-1")
     try:
-        print(f"Downloading file from bucket '{bucket_name}' with object '{object_name}' and storing to path '{local_file_path}'")
+        logger.info(f"Downloading file from bucket '{bucket_name}' with object '{object_name}' and storing to path '{local_file_path}'")
         s3_client.download_file(bucket_name, object_name, local_file_path)
         return True
     except Exception as e:
-        print(f"Error downloading file '{object_name}' from bucket '{bucket_name}': {e}")
+        logger.info(f"Error downloading file '{object_name}' from bucket '{bucket_name}': {e}")
         return False
 def local_training(global_weights):
     Mbits_transmitted = []
@@ -58,12 +59,12 @@ def local_training(global_weights):
     dataset = windowed_dataset(np.array(series_trans), window_size, batch_size, len(series_trans))
     smlp_local = SimpleMLP()
     local_model = smlp_local.build()
-    print("compiling the model with a mean squared error loss and a stochastic gradient descent optimizer")
+    logger.info("compiling the model with a mean squared error loss and a stochastic gradient descent optimizer")
     local_model.compile(loss="mse", optimizer=tf.keras.optimizers.SGD(learning_rate=3e-4, momentum=0.9),
                         metrics=["mae"])
-    print("set local model weight to the weight of the global model")
+    logger.info("set local model weight to the weight of the global model")
     local_model.set_weights(global_weights)
-    print("fit local model with client's data")
+    logger.info("fit local model with client's data")
     local_model.fit(dataset, epochs=1, verbose=0)
     serialized_weights = pickle.dumps(global_weights)
     base64_encoded_weights = base64.b64encode(serialized_weights).decode('utf-8')

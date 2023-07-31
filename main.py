@@ -4,6 +4,7 @@ import pickle
 from fastapi import FastAPI, HTTPException
 import base64
 from pydantic import BaseModel
+from logger_config import logger
 
 import client_sthlm
 
@@ -23,7 +24,7 @@ async def root():
 
 @app.get("/download_dataset")
 async def download_dataset():
-    print("Api hit for download")
+    logger.info("Api hit for download")
     response = client_sthlm.download_file_from_s3(bucket_name, object_name, local_file_path)
     return {"message": f"Dataset download result '{response}'!"}
 
@@ -38,7 +39,7 @@ async def test(weights_data: WeightsData):
     except pickle.UnpicklingError as e:
         raise HTTPException(status_code=400, detail="Invalid weights data")
     result = client_sthlm.local_training(global_weights)
-    print(f"Returning result for {result[0]}")
+    logger.info(f"Returning result for {result[0]}")
     return result
 
 if __name__ == "__main__":
