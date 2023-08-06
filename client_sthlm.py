@@ -66,6 +66,6 @@ def local_training(global_weights):
     local_model.set_weights(global_weights)
     logger.info("fit local model with client's data")
     local_model.fit(dataset, epochs=1, verbose=0)
-    serialized_weights = pickle.dumps(global_weights)
+    serialized_weights = pickle.dumps(local_model.get_weights())
     base64_encoded_weights = base64.b64encode(serialized_weights).decode('utf-8')
     return 'clientSTHLM', len(series_trans), base64_encoded_weights
